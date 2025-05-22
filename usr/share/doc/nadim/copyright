@@ -1,0 +1,6 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Nadim Dolphin Rescue
+Source: https://github.com/numerimondes/nadim
+Files: *
+Copyright: 2025 Yassine ElMoumen
+License: GPL-3.0

@@ -1,0 +1,11 @@
+Package: nadim
+Version: 1.0.0
+Section: utils
+Priority: optional
+Architecture: all
+Depends: bash (>= 4.0)
+Maintainer: Yassine ElMoumen <yassine@numerimondes.com>
+Homepage: https://github.com/numerimondes/nadim
+Description: Modular shell scripting framework for CLI tools
+ Nadim Dolphin Rescue provides a structured environment for creating,
+ managing, and sharing command-line tools using shell scripts.

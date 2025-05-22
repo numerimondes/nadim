@@ -1,0 +1,46 @@
+#!/bin/sh
+set -e
+
+USER_NAME=$(logname 2>/dev/null || echo "${SUDO_USER:-$USER}")
+
+if [ -n "$USER_NAME" ] && [ "$USER_NAME" != "root" ]; then
+    USER_DIR="/usr/lib/nadim/users/$USER_NAME"
+    mkdir -p "$USER_DIR"
+    chown "$USER_NAME":"$USER_NAME" "$USER_DIR"
+    chmod 0755 "$USER_DIR"
+
+    CONFIG_FILE="$USER_DIR/config.sh"
+    if [ ! -f "$CONFIG_FILE" ]; then
+        {
+            echo "#!/bin/sh"
+            echo "NADIM_FALLBACK_ENABLED=0"
+        } > "$CONFIG_FILE"
+        chown "$USER_NAME":"$USER_NAME" "$CONFIG_FILE"
+        chmod 0644 "$CONFIG_FILE"
+    fi
+
+    for file in .nadim_command_history .nadim_history; do
+        touch "$USER_DIR/$file"
+        chown "$USER_NAME":"$USER_NAME" "$USER_DIR/$file"
+        chmod 0644 "$USER_DIR/$file"
+    done
+fi
+
+# IMPORTANT: Avoid recursive chown/chmod here to satisfy security
+# We Assume nadim-tools directory and contents have correct ownership/permissions set at package build time
+
+# Create symlinks in /usr/bin owned by root (overwrite if exists)
+ln -sf /usr/lib/nadim/nadim.sh /usr/bin/nadim 2>/dev/null || true
+ln -sf /usr/lib/nadim/nadimdr.sh /usr/bin/nadimdr 2>/dev/null || true
+ln -sf /usr/lib/nadim/nsh.sh /usr/bin/nsh 2>/dev/null || true
+
+COMPLETION_FILE="/usr/share/bash-completion/completions/nadim"
+BASHRC="/etc/bash.bashrc"
+if [ -f "$COMPLETION_FILE" ] && ! grep -q "source $COMPLETION_FILE" "$BASHRC" 2>/dev/null; then
+    echo "source $COMPLETION_FILE" >> "$BASHRC"
+fi
+
+echo "Nadim Dolphin Rescue v1.0.0 installed successfully!"
+echo "Run 'nadim help' to get started."
+
+exit 0

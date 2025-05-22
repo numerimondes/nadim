@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+# Source environment file only if it exists and is readable
+ENV_FILE="/usr/lib/nadim/platform/environment.sh"
+if [ -r "$ENV_FILE" ]; then
+    . "$ENV_FILE" || echo "Warning: failed to source $ENV_FILE"
+fi
+
+exit 0

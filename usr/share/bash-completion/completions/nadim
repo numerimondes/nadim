@@ -1,0 +1,18 @@
+#!/bin/bash
+# Bash completion for nadim, nadimdr, and nsh
+_nadim_completion() {
+    local cur prev words cword
+    _init_completion -n = || return
+    local commands="help shell tools --enable-fallback --disable-fallback"
+    local tool_dir="/usr/lib/nadim/nadim-tools"
+    [ -d "$tool_dir" ] && for dir in "$tool_dir"/*; do
+        [ -d "$dir" ] && [ -f "$dir/config.sh" ] && . "$dir/config.sh" 2>/dev/null &&         commands="$commands $TOOL_NAME${TOOL_ALTERNATIVE:+ $TOOL_ALTERNATIVE}"
+    done
+    [ "$cword" -eq 1 ] && COMPREPLY=($(compgen -W "$commands" -- "$cur")) && return
+    local tool="${words[1]}" tool_dir_path="$tool_dir/$tool"
+    [ ! -d "$tool_dir_path" ] && for dir in "$tool_dir"/*; do
+        [ -d "$dir" ] && [ -f "$dir/config.sh" ] && . "$dir/config.sh" 2>/dev/null &&         [ "$TOOL_ALTERNATIVE" = "$tool" ] && tool_dir_path="$dir" && break
+    done
+    [ "$cword" -eq 2 ] && [ -d "$tool_dir_path" ] &&     COMPREPLY=($(compgen -W "$(ls "$tool_dir_path/commands"/*.sh 2>/dev/null | while read f; do basename "$f" .sh; done)" -- "$cur"))
+}
+complete -F _nadim_completion nadim nadimdr nsh
